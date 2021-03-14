@@ -1,5 +1,6 @@
 const express = require('express')
 const mongoose = require('mongoose')
+const passport = require('passport')
 const bodyParser = require('body-parser')
 const authRoutes = require('./routes/auth')
 const analyticsRoutes = require('./routes/analytics')
@@ -7,6 +8,7 @@ const categoryRoutes = require('./routes/category')
 const orderRoutes = require('./routes/order')
 const positionRoutes = require('./routes/position')
 const keys = require('./config/keys')
+
 
 const morgan = require("morgan");
 
@@ -16,6 +18,8 @@ mongoose.connect(keys.mongoURI)
     .then(() => console.log("Mongo DB Connected")) // У любого промиса есть метод then
     .catch(error => console.log(error)) // тоже есть у любого промиса
 
+app.use(passport.initialize())
+require('./middleware/passport')(passport)
 app.use((morgan)('dev'))
 
 app.use(bodyParser.urlencoded({extended: true}))

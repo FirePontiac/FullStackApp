@@ -1,6 +1,8 @@
 const express = require('express')
 const controller = require('../controllers/auth')
 
+// Задача чтобы эти роуты получали только авторизованные пользователи, т.е. только те у которых токен совпал
+
 const router = express.Router() // Создали локальный роутер, Router - эта константа это конструктор
 // localhost:5000/api/auth/login
 router.post('/login', controller.login // без CallBack функции, не вызывая, она будет вызвана только в том случае,
