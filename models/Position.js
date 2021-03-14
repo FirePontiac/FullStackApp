@@ -6,7 +6,7 @@ const positionSchema = new Schema({
         required: true
     },
     cost: {
-        type: number,
+        type: Number,
         required: true
     },
     category: {
