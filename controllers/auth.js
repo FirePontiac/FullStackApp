@@ -1,18 +1,47 @@
 // Сперва подключим модель пользователя
 const bcrypt = require('bcryptjs')
-
+const jwt = require('jsonwebtoken')
+const keys = require('../config/keys')
 const User = require('../models/User') // В переменной User находится модель которая взаимодействует с базой данных,
     // сохраняет что то в неё или забирает
 
 // Тут будут функции которые мы будем экспортировать в зависимости от Роута
-module.exports.login = function (req, res) {
-    res.status(200).json({ // Методом json передаём данные
-        // Было login: true // Это для теста
-        login: { // Пользовательские данные
-            email: req.body.email,
-            password: req.body.password
+module.exports.login = async function (req, res) {
+    // res.status(200).json({ // Методом json передаём данные
+    //     // Было login: true // Это для теста
+    //     login: { // Пользовательские данные
+    //         email: req.body.email,
+    //         password: req.body.password
+    //     }
+    // }) // тестовая
+
+    const candidate = await User.findOne({email: req.body.email})
+    if (candidate) {
+        // Проверка пароля, пользователь существует
+        const passwodResult = bcrypt.compareSync(req.body.password, candidate.password)
+        if (passwodResult) {
+            // Генерация токена, пароли совпали
+            const token = jwt.sign({ // По токену сможем узнать кто этот пользователь, какие данные хотим положить
+                // и когда истекает действие данного токена
+                email: candidate.email,
+                userId: candidate._id
+            }, keys.jwt, {expiresIn: 60 * 60}) // Тут указываем приватный ключ, и время жизни токена
+
+            res.status(200).json({
+                token: `Bearer ${token}`
+            })
+        } else {
+            // Пароли не совпали
+            res.status(401).json({
+                message: 'Пароли не совпадают. Попробуйте снова.'
+            })
         }
-    })
+    } else {
+        // Пользователя нет, ошибка
+        res.status(404).json({
+            message: 'Пользователь с таким email не найден'
+        })
+    }
 }
 // Далее напишем все необходимые модули для регистрации
 module.exports.register = async function (req, res) {
