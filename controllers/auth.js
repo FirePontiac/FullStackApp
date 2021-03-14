@@ -1,5 +1,6 @@
 // Сперва подключим модель пользователя
 const bcrypt = require('bcryptjs')
+const errorHandler = require('../utils/errorHandler')
 const jwt = require('jsonwebtoken')
 const keys = require('../config/keys')
 const User = require('../models/User') // В переменной User находится модель которая взаимодействует с базой данных,
@@ -83,7 +84,7 @@ module.exports.register = async function (req, res) {
             res.status(201).json(user) // Обратно вернули обьект user пользователю
         } catch(e) {
             // Обработать ошибку
-
+            errorHandler(res, e)
         }
 
 
